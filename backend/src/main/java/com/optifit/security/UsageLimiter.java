@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.security;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -6,8 +6,14 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import com.optifit.config.AppProperties;
+import com.optifit.exception.ApiException;
+
+import lombok.RequiredArgsConstructor;
+
 @Component
-class UsageLimiter {
+@RequiredArgsConstructor
+public class UsageLimiter {
 
     private record Counter(long window, int count) {
     }
@@ -15,11 +21,7 @@ class UsageLimiter {
     private final Map<String, Counter> counters = new HashMap<>();
     private final AppProperties properties;
 
-    UsageLimiter(AppProperties properties) {
-        this.properties = properties;
-    }
-
-    synchronized void reserve(String session, String ip) {
+    public synchronized void reserve(String session, String ip) {
         long hour = Instant.now().getEpochSecond() / 3600, day = hour / 24;
         counters.entrySet().removeIf(e -> !e.getKey().equals("daily") && e.getValue().window() != hour);
         if (counters.size() > 10000) {

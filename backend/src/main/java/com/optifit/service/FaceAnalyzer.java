@@ -1,9 +1,9 @@
-package com.optifit;
+package com.optifit.service;
 
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.Preferences;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.Preferences;
 
-interface FaceAnalyzer {
+public interface FaceAnalyzer {
 
     FaceProfile analyze(byte[] jpeg);
 

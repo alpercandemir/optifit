@@ -7,10 +7,13 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.Shape;
+import com.optifit.exception.ApiException;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.Shape;
+import com.optifit.service.GeminiFaceAnalyzer;
 
 class GeminiFaceAnalyzerTest {
+
     @Test
     void acceptsAUsableSingleFaceProfile() {
         var profile = new FaceProfile(true, 1, "Visual style suggestion only.", List.of(Shape.ROUND));

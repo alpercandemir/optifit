@@ -1,25 +1,27 @@
-package com.optifit;
+package com.optifit.service;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 
-import com.optifit.Models.Category;
-import com.optifit.Models.ModelSuggestion;
-import com.optifit.Models.Product;
+import com.optifit.model.Category;
+import com.optifit.model.ModelSuggestion;
+import com.optifit.model.Product;
+import com.optifit.util.TextNormalizer;
 
 /**
  * AI candidates guide discovery; only independently verified Products may be
  * offered.
  */
-final class ModelSuggestions {
+public final class ModelSuggestions {
+
     // Observed in Atasun's Turkish catalogue; this is not a stock/price guarantee.
-    static final List<String> BRANDS = List.of("Ray-Ban", "Osse", "Inesta", "Mustang");
+    public static final List<String> BRANDS = List.of("Ray-Ban", "Osse", "Inesta", "Mustang");
 
     private ModelSuggestions() {
     }
 
-    static List<ModelSuggestion> valid(List<ModelSuggestion> candidates, Category category) {
+    public static List<ModelSuggestion> valid(List<ModelSuggestion> candidates, Category category) {
         if (candidates == null || category == null) {
             return List.of();
         }
@@ -44,13 +46,13 @@ final class ModelSuggestions {
         return List.copyOf(valid.values());
     }
 
-    static boolean matches(ModelSuggestion candidate, Product product) {
+    public static boolean matches(ModelSuggestion candidate, Product product) {
         return candidate.category() == product.category()
                 && identity(candidate.brand()).equals(identity(product.brand()))
                 && identity(candidate.modelCode()).equals(identity(product.modelCode()));
     }
 
     private static String identity(String value) {
-        return ProductPageParser.normalize(value).replaceAll("[^a-z0-9]", "");
+        return TextNormalizer.normalize(value).replaceAll("[^a-z0-9]", "");
     }
 }

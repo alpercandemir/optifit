@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.search;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,23 +18,28 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.optifit.Models.Category;
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.Preferences;
-import com.optifit.Models.Product;
-import com.optifit.Models.Shape;
+import com.optifit.config.AppProperties;
+import com.optifit.exception.ApiException;
+import com.optifit.model.Category;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.Preferences;
+import com.optifit.model.Product;
+import com.optifit.model.Shape;
+import com.optifit.service.ModelSuggestions;
+import com.optifit.service.RecommendationRanker;
 
 import tools.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
-class WebProductSearch implements ProductSearchProvider {
-    private static final Logger log = LoggerFactory.getLogger(WebProductSearch.class);
+public class WebProductSearch implements ProductSearchProvider {
 
     private final AppProperties properties;
     private final SafePageFetcher fetcher;
@@ -44,12 +49,13 @@ class WebProductSearch implements ProductSearchProvider {
     private final ProductLinkExtractor links;
 
     @Autowired
-    WebProductSearch(AppProperties properties, SafePageFetcher fetcher, ProductPageParser parser, ObjectMapper json) {
+    public WebProductSearch(AppProperties properties, SafePageFetcher fetcher, ProductPageParser parser,
+            ObjectMapper json) {
         this(properties, fetcher, parser, json, HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(4)).build());
     }
 
-    WebProductSearch(AppProperties properties, SafePageFetcher fetcher, ProductPageParser parser, ObjectMapper json,
-            HttpClient http) {
+    public WebProductSearch(AppProperties properties, SafePageFetcher fetcher, ProductPageParser parser,
+            ObjectMapper json, HttpClient http) {
         this.properties = properties;
         this.fetcher = fetcher;
         this.parser = parser;
@@ -153,11 +159,11 @@ class WebProductSearch implements ProductSearchProvider {
         return Duration.ofNanos(Math.min(nanos, maximum.toNanos()));
     }
 
-    static String searchQuery(Preferences preferences, FaceProfile face) {
+    public static String searchQuery(Preferences preferences, FaceProfile face) {
         var models = ModelSuggestions.valid(face.suggestedModels(), preferences.category());
         if (!models.isEmpty()) {
             String candidates = models.stream().map(model -> "\"" + model.brand() + " " + model.modelCode() + "\"")
-                    .collect(java.util.stream.Collectors.joining(" OR "));
+                    .collect(Collectors.joining(" OR "));
             return "(" + candidates + ") "
                     + (preferences.category() == Category.SUNGLASSES ? "güneş gözlüğü" : "optik gözlük çerçevesi");
         }
@@ -175,7 +181,8 @@ class WebProductSearch implements ProductSearchProvider {
     private record PageResult(Optional<Product> product, List<String> links) {
     }
 
-    List<Product> verifyPages(List<String> urls, Category category, Duration timeout) throws InterruptedException {
+    public List<Product> verifyPages(List<String> urls, Category category, Duration timeout)
+            throws InterruptedException {
         long deadline = System.nanoTime() + timeout.toNanos();
         var pending = new ArrayDeque<PageRequest>();
         var seen = new LinkedHashSet<String>();
@@ -278,7 +285,7 @@ class WebProductSearch implements ProductSearchProvider {
         return new PageResult(product, discovered);
     }
 
-    static List<Product> demoProducts(Category category) {
+    public static List<Product> demoProducts(Category category) {
         // Real discovered source links, no invented stock/price or claims of live
         // verification.
         // Optical demo intentionally returns no match rather than relabeling sunglasses

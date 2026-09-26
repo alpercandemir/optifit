@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.service;
 
 import java.awt.Color;
 import java.awt.RenderingHints;
@@ -19,9 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.exif.ExifIFD0Directory;
+import com.optifit.exception.ApiException;
 
 @Component
-class PhotoProcessor {
+public class PhotoProcessor {
 
     private static final long MAX_FILE_BYTES = 10 * 1024 * 1024;
     private static final long MAX_PIXELS = 20_000_000;
@@ -30,7 +31,7 @@ class PhotoProcessor {
     private static final int MAX_CONCURRENT_DECODERS = 2;
     private final Semaphore decoders = new Semaphore(MAX_CONCURRENT_DECODERS);
 
-    record Photo(byte[] bytes) implements AutoCloseable {
+    public record Photo(byte[] bytes) implements AutoCloseable {
 
         @Override
         public void close() {
@@ -38,7 +39,7 @@ class PhotoProcessor {
         }
     }
 
-    Photo process(MultipartFile file) {
+    public Photo process(MultipartFile file) {
         if (file.isEmpty() || file.getSize() > MAX_FILE_BYTES) {
             throw ApiException.badRequest("Select a photo between 1 byte and 10 MB.");
         }
@@ -144,7 +145,7 @@ class PhotoProcessor {
         return resized;
     }
 
-    static BufferedImage orient(BufferedImage image, int orientation) {
+    public static BufferedImage orient(BufferedImage image, int orientation) {
         int w = image.getWidth(), h = image.getHeight();
         if (orientation < 2 || orientation > 8) {
             return image;

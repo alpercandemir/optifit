@@ -12,6 +12,9 @@ import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
+import com.optifit.exception.ApiException;
+import com.optifit.service.PhotoProcessor;
+
 class PhotoProcessorTest {
 
     @Test

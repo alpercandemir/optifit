@@ -27,6 +27,9 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.optifit.repository.JobRepository;
+import com.optifit.service.RecommendationService;
+
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(properties = {"optifit.mode=demo", "optifit.session-limit=100", "optifit.ip-limit=100",

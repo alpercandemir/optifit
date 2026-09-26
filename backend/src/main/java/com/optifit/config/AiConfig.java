@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.config;
 
 import java.util.List;
 
@@ -15,16 +15,19 @@ import org.springframework.core.retry.RetryTemplate;
 import com.google.genai.Client;
 import com.google.genai.types.HttpOptions;
 import com.google.genai.types.HttpRetryOptions;
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.Shape;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.Shape;
+import com.optifit.service.FaceAnalyzer;
+import com.optifit.service.GeminiFaceAnalyzer;
 
 import io.micrometer.core.instrument.MeterRegistry;
 
 @Configuration
-class AiConfig {
+public class AiConfig {
+
     @Bean
     @ConditionalOnProperty(name = "optifit.mode", havingValue = "live", matchIfMissing = true)
-    GoogleGenAiChatModel geminiChatModel(AppProperties properties) {
+    public GoogleGenAiChatModel geminiChatModel(AppProperties properties) {
         var client = Client.builder().apiKey(properties.geminiKey()).vertexAI(false).httpOptions(HttpOptions.builder()
                 .timeout(22_000).retryOptions(HttpRetryOptions.builder().attempts(1).build()).build()).build();
         var options = GoogleGenAiChatOptions.builder().model(properties.model()).maxOutputTokens(700).build();
@@ -35,7 +38,7 @@ class AiConfig {
     }
 
     @Bean
-    FaceAnalyzer faceAnalyzer(AppProperties properties, MeterRegistry metrics,
+    public FaceAnalyzer faceAnalyzer(AppProperties properties, MeterRegistry metrics,
             ObjectProvider<GoogleGenAiChatModel> model) {
         if (properties.demo()) {
             return jpeg -> new FaceProfile(true, 1, "Demo: no photo analysis was performed.",

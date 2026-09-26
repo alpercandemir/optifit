@@ -14,10 +14,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.optifit.Models.Category;
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.Preferences;
-import com.optifit.Models.Shape;
+import com.optifit.config.AppProperties;
+import com.optifit.exception.ApiException;
+import com.optifit.model.Category;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.Preferences;
+import com.optifit.model.Shape;
+import com.optifit.repository.JobRepository;
+import com.optifit.search.WebProductSearch;
+import com.optifit.security.UsageLimiter;
+import com.optifit.service.FaceAnalyzer;
+import com.optifit.service.PhotoProcessor;
+import com.optifit.service.RecommendationRanker;
+import com.optifit.service.RecommendationService;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 

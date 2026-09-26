@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,13 +7,15 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
+import com.optifit.exception.ApiErrorResponse;
+
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration
-class SecurityConfig {
+public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain security(HttpSecurity http, ObjectMapper json) throws Exception {
+    public SecurityFilterChain security(HttpSecurity http, ObjectMapper json) throws Exception {
         return http
                 .authorizeHttpRequests(
                         a -> a.requestMatchers("/api/**", "/actuator/health").permitAll().anyRequest().denyAll())

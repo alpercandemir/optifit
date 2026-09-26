@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -21,18 +21,29 @@ import jakarta.annotation.PreDestroy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.optifit.Models.Category;
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.JobView;
-import com.optifit.Models.Preferences;
-import com.optifit.Models.Result;
+import com.optifit.config.AppProperties;
+import com.optifit.exception.ApiException;
+import com.optifit.model.Category;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.JobView;
+import com.optifit.model.Preferences;
+import com.optifit.model.Result;
+import com.optifit.repository.JobRepository;
+import com.optifit.search.ProductSearchProvider;
+import com.optifit.security.UsageLimiter;
 
 import io.micrometer.core.instrument.MeterRegistry;
 
 import tools.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
-class RecommendationService {
+@RequiredArgsConstructor
+public class RecommendationService {
+
     private static final int WORKER_COUNT = 2;
     private static final int QUEUE_CAPACITY = 4;
     private static final int RECOMMENDATION_COUNT = 3;
@@ -45,6 +56,7 @@ class RecommendationService {
     private final AppProperties properties;
     private final ObjectMapper json;
     private final MeterRegistry metrics;
+
     private final ThreadPoolExecutor workers = new ThreadPoolExecutor(WORKER_COUNT, WORKER_COUNT, 0, TimeUnit.SECONDS,
             new ArrayBlockingQueue<>(QUEUE_CAPACITY), new ThreadPoolExecutor.AbortPolicy());
 
@@ -53,20 +65,7 @@ class RecommendationService {
 
     private final ConcurrentMap<String, Work> work = new ConcurrentHashMap<>();
 
-    RecommendationService(JobRepository jobs, FaceAnalyzer analyzer, ProductSearchProvider products,
-            RecommendationRanker ranker, UsageLimiter limiter, AppProperties properties, ObjectMapper json,
-            MeterRegistry metrics) {
-        this.jobs = jobs;
-        this.analyzer = analyzer;
-        this.products = products;
-        this.ranker = ranker;
-        this.limiter = limiter;
-        this.properties = properties;
-        this.json = json;
-        this.metrics = metrics;
-    }
-
-    synchronized JobView submit(String owner, String ip, String key, PhotoProcessor.Photo photo,
+    public synchronized JobView submit(String owner, String ip, String key, PhotoProcessor.Photo photo,
             Preferences preferences) {
         boolean transferred = false;
         try {
@@ -111,11 +110,11 @@ class RecommendationService {
         }
     }
 
-    JobView get(String id, String owner) {
+    public JobView get(String id, String owner) {
         return view(jobs.get(id, owner).orElseThrow(ApiException::missing));
     }
 
-    synchronized void delete(String id, String owner) {
+    public synchronized void delete(String id, String owner) {
         jobs.get(id, owner).orElseThrow(ApiException::missing);
         jobs.delete(id, owner);
         cancel(id);
@@ -217,7 +216,7 @@ class RecommendationService {
     }
 
     @Scheduled(fixedDelay = 1000)
-    void expire() {
+    public void expire() {
         for (var job : jobs.timedOut(System.currentTimeMillis() - properties.timeoutSeconds() * 1000L)) {
             jobs.fail(job.id(), "TIMEOUT", "The analysis timed out. Your photo has been deleted; please try again.");
             cancel(job.id());
@@ -226,7 +225,7 @@ class RecommendationService {
     }
 
     @PreDestroy
-    void shutdown() {
+    public void shutdown() {
         workers.shutdownNow();
         work.values().forEach(w -> w.photo().close());
     }

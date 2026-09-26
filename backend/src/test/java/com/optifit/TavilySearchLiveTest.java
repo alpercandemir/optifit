@@ -9,10 +9,13 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.optifit.Models.Category;
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.Preferences;
-import com.optifit.Models.Shape;
+import com.optifit.model.Category;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.ModelSuggestion;
+import com.optifit.model.Preferences;
+import com.optifit.model.Shape;
+import com.optifit.search.WebProductSearch;
+import com.optifit.service.ModelSuggestions;
 
 /**
  * Explicit opt-in: consumes one basic Tavily search credit per test; never
@@ -22,6 +25,7 @@ import com.optifit.Models.Shape;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {"optifit.mode=live",
         "server.address=127.0.0.1"})
 class TavilySearchLiveTest {
+
     @Autowired
     WebProductSearch search;
 
@@ -37,13 +41,14 @@ class TavilySearchLiveTest {
             assertThat(product.checkedAt()).isNotNull();
         });
     }
+
     @Test
     void specificModelCandidatesReturnRealProductDetails() {
         var preferences = new Preferences(Category.SUNGLASSES, null, "ANY", "ANY");
         var face = new FaceProfile(true, 1, "", List.of(Shape.RECTANGULAR),
-                List.of(new com.optifit.Models.ModelSuggestion("Ray-Ban", "RB2140", Category.SUNGLASSES),
-                        new com.optifit.Models.ModelSuggestion("Ray-Ban", "RB2132", Category.SUNGLASSES),
-                        new com.optifit.Models.ModelSuggestion("Ray-Ban", "RB4340", Category.SUNGLASSES)));
+                List.of(new ModelSuggestion("Ray-Ban", "RB2140", Category.SUNGLASSES),
+                        new ModelSuggestion("Ray-Ban", "RB2132", Category.SUNGLASSES),
+                        new ModelSuggestion("Ray-Ban", "RB4340", Category.SUNGLASSES)));
         var products = search.search(preferences, face);
         System.out.println("Targeted Tavily verified products: " + products.size());
         products.forEach(product -> System.out.println(product.modelCode() + " " + product.productUrl()));
@@ -55,5 +60,4 @@ class TavilySearchLiveTest {
             assertThat(product.checkedAt()).isNotNull();
         });
     }
-
 }

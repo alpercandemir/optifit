@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -7,28 +7,28 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.Offer;
-import com.optifit.Models.Preferences;
-import com.optifit.Models.Product;
-import com.optifit.Models.Recommendation;
-import com.optifit.Models.Shape;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.Offer;
+import com.optifit.model.Preferences;
+import com.optifit.model.Product;
+import com.optifit.model.Recommendation;
+import com.optifit.model.Shape;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
-class RecommendationRanker {
-
-    private static final Logger log = LoggerFactory.getLogger(RecommendationRanker.class);
+public class RecommendationRanker {
 
     private static final int MAX_RECOMMENDATIONS = 3;
     private static final int SHAPE_MATCH_SCORE = 30;
     private static final int SHAPE_RANK_PENALTY = 4;
     private static final int PREFERENCE_MATCH_SCORE = 8;
 
-    List<Recommendation> rank(List<Product> products, Preferences preferences, FaceProfile profile, boolean demo) {
+    public List<Recommendation> rank(List<Product> products, Preferences preferences, FaceProfile profile,
+            boolean demo) {
         List<Product> eligibleProducts = products.stream()
                 .filter(product -> product.category() == preferences.category())
                 .filter(product -> withinBudget(product, preferences))
@@ -110,7 +110,7 @@ class RecommendationRanker {
         return score;
     }
 
-    static String label(Shape shape) {
+    public static String label(Shape shape) {
         return switch (shape) {
             case ROUND -> "Round";
             case RECTANGULAR -> "Rectangular";

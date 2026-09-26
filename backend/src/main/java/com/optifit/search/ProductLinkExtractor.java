@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.search;
 
 import java.net.URI;
 import java.util.LinkedHashSet;
@@ -10,19 +10,19 @@ import org.jsoup.nodes.Document;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * Discovers detail-page candidates; listing text is never treated as product
  * evidence.
  */
-final class ProductLinkExtractor {
+@RequiredArgsConstructor
+public final class ProductLinkExtractor {
+
     private static final int MAX_LINKS = 24;
     private final ObjectMapper json;
 
-    ProductLinkExtractor(ObjectMapper json) {
-        this.json = json;
-    }
-
-    List<String> extract(Document document) {
+    public List<String> extract(Document document) {
         var candidates = new LinkedHashSet<String>();
         for (var script : document.select("script[type=application/ld+json]")) {
             try {

@@ -17,7 +17,14 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import com.google.genai.Client;
 import com.google.genai.types.HttpOptions;
-import com.optifit.Models.Shape;
+import com.optifit.config.AiConfig;
+import com.optifit.config.AppProperties;
+import com.optifit.model.Category;
+import com.optifit.model.ModelSuggestion;
+import com.optifit.model.Preferences;
+import com.optifit.model.Shape;
+import com.optifit.service.FaceAnalyzer;
+import com.optifit.service.GeminiFaceAnalyzer;
 import com.sun.net.httpserver.HttpServer;
 
 import io.micrometer.core.instrument.MeterRegistry;
@@ -26,6 +33,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import tools.jackson.databind.json.JsonMapper;
 
 class GeminiIntegrationTest {
+
     @Test
     void sendsInlineJpegAndSchemaToGeminiAndRecordsUsage() throws Exception {
         var json = JsonMapper.builder().build();
@@ -64,11 +72,9 @@ class GeminiIntegrationTest {
                     .build();
             byte[] jpeg = {(byte) 0xff, (byte) 0xd8, (byte) 0xff};
             var analyzer = new GeminiFaceAnalyzer(ChatClient.create(model), metrics, "gemini-2.5-flash-lite");
-            var profile = analyzer.analyze(jpeg,
-                    new com.optifit.Models.Preferences(com.optifit.Models.Category.SUNGLASSES, null, "ANY", "ANY"));
+            var profile = analyzer.analyze(jpeg, new Preferences(Category.SUNGLASSES, null, "ANY", "ANY"));
             assertThat(profile.preferredShapes()).containsExactly(Shape.ROUND);
-            assertThat(profile.suggestedModels()).extracting(com.optifit.Models.ModelSuggestion::modelCode)
-                    .containsExactly("RB3447");
+            assertThat(profile.suggestedModels()).extracting(ModelSuggestion::modelCode).containsExactly("RB3447");
             assertThat(path.get()).endsWith("/models/gemini-2.5-flash-lite:generateContent");
             assertThat(key.get()).isEqualTo("test-gemini-key");
             var payload = json.readTree(body.get());

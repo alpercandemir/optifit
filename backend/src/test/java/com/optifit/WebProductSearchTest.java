@@ -35,10 +35,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
-import com.optifit.Models.Category;
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.Preferences;
-import com.optifit.Models.Shape;
+import com.optifit.config.AppProperties;
+import com.optifit.exception.ApiException;
+import com.optifit.model.Category;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.ModelSuggestion;
+import com.optifit.model.Preferences;
+import com.optifit.model.Product;
+import com.optifit.model.Shape;
+import com.optifit.search.ProductPageParser;
+import com.optifit.search.SafePageFetcher;
+import com.optifit.search.WebProductSearch;
 
 import tools.jackson.databind.json.JsonMapper;
 
@@ -144,7 +151,7 @@ class WebProductSearchTest {
     @SuppressWarnings("unchecked")
     void emptyModelSearchFallsBackOnceAndVerifiesRealProducts() throws Exception {
         var suggested = new FaceProfile(true, 1, "Private face description", List.of(Shape.ROUND),
-                List.of(new com.optifit.Models.ModelSuggestion("Ray-Ban", "RB9999", Category.SUNGLASSES)));
+                List.of(new ModelSuggestion("Ray-Ban", "RB9999", Category.SUNGLASSES)));
         HttpResponse<String> empty = mock(HttpResponse.class);
         HttpResponse<String> found = mock(HttpResponse.class);
         when(empty.statusCode()).thenReturn(200);
@@ -178,7 +185,7 @@ class WebProductSearchTest {
     void emptyFallbackIsBoundedAndDoesNotSubstituteDemoProducts() throws Exception {
         respond(200, "{\"results\":[]}");
         var suggested = new FaceProfile(true, 1, "", List.of(Shape.ROUND),
-                List.of(new com.optifit.Models.ModelSuggestion("Ray-Ban", "RB9999", Category.SUNGLASSES)));
+                List.of(new ModelSuggestion("Ray-Ban", "RB9999", Category.SUNGLASSES)));
         assertThat(search(properties).search(preferences, suggested)).isEmpty();
         verify(http, times(2)).send(any(), any());
         verify(fetcher, never()).fetch(anyString());

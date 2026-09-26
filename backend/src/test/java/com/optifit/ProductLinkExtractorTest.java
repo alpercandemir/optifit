@@ -5,9 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Test;
 
+import com.optifit.search.ProductLinkExtractor;
+
 import tools.jackson.databind.json.JsonMapper;
 
 class ProductLinkExtractorTest {
+
     private final ProductLinkExtractor extractor = new ProductLinkExtractor(JsonMapper.builder().build());
 
     @Test

@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.search;
 
 import java.net.InetAddress;
 import java.net.URI;
@@ -9,22 +9,24 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Component;
 
+import com.optifit.config.AppProperties;
+
 @Component
-class SafePageFetcher {
+public class SafePageFetcher {
 
     private final List<String> hosts;
 
-    SafePageFetcher(AppProperties properties) {
+    public SafePageFetcher(AppProperties properties) {
         hosts = properties.allowedMerchants();
     }
 
-    boolean allowed(URI uri) {
+    public boolean allowed(URI uri) {
         return ("https".equalsIgnoreCase(uri.getScheme()) && uri.getHost() != null
                 && hosts.contains(uri.getHost().toLowerCase(Locale.ROOT)) && uri.getUserInfo() == null
                 && (uri.getPort() == -1 || uri.getPort() == 443));
     }
 
-    Document fetch(String url) throws Exception {
+    public Document fetch(String url) throws Exception {
         checkInterrupted();
         var uri = URI.create(url);
         for (int i = 0; i < 4; i++) {
@@ -59,13 +61,13 @@ class SafePageFetcher {
         throw new IllegalArgumentException("Too many redirects");
     }
 
-    static void checkInterrupted() throws InterruptedException {
+    public static void checkInterrupted() throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException("Product verification was cancelled");
         }
     }
 
-    static boolean publicAddress(InetAddress a) {
+    public static boolean publicAddress(InetAddress a) {
         if (a.isAnyLocalAddress() || a.isLoopbackAddress() || a.isLinkLocalAddress() || a.isSiteLocalAddress()
                 || a.isMulticastAddress()) {
             return false;

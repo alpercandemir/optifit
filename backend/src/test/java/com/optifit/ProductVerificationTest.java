@@ -13,11 +13,17 @@ import java.util.Map;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Test;
 
-import com.optifit.Models.Category;
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.Preferences;
-import com.optifit.Models.Product;
-import com.optifit.Models.Shape;
+import com.optifit.config.AppProperties;
+import com.optifit.exception.ApiException;
+import com.optifit.model.Category;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.Preferences;
+import com.optifit.model.Product;
+import com.optifit.model.Shape;
+import com.optifit.search.ProductPageParser;
+import com.optifit.search.SafePageFetcher;
+import com.optifit.security.UsageLimiter;
+import com.optifit.service.RecommendationRanker;
 
 import tools.jackson.databind.json.JsonMapper;
 

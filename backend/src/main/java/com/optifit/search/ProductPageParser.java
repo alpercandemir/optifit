@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.search;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -16,24 +16,25 @@ import java.util.regex.Pattern;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Component;
 
-import com.optifit.Models.Category;
-import com.optifit.Models.Product;
-import com.optifit.Models.Shape;
+import com.optifit.model.Category;
+import com.optifit.model.Product;
+import com.optifit.model.Shape;
+import com.optifit.service.RecommendationRanker;
+import com.optifit.util.TextNormalizer;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
-class ProductPageParser {
+@RequiredArgsConstructor
+public class ProductPageParser {
 
     private static final Pattern MODEL = Pattern.compile("(?i)\\b0?([a-z]{1,5})[ -]?(\\d{3,6}[a-z]?(?:/[a-z])?)\\b");
     private final ObjectMapper json;
 
-    ProductPageParser(ObjectMapper json) {
-        this.json = json;
-    }
-
-    Optional<Product> parse(Document document, Category requested) {
+    public Optional<Product> parse(Document document, Category requested) {
         var found = new ArrayList<JsonNode>();
         for (var script : document.select("script[type=application/ld+json]")) {
             try {
@@ -261,9 +262,8 @@ class ProductPageParser {
         }
     }
 
-    static String normalize(String s) {
-        return Normalizer.normalize(s.toLowerCase(Locale.forLanguageTag("tr")).replace('ı', 'i'), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
+    public static String normalize(String s) {
+        return TextNormalizer.normalize(s);
     }
 
     private static String cleanUrl(URI uri) {

@@ -7,7 +7,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.optifit.config.AppProperties;
+
 class AppPropertiesTest {
+
     @Test
     void liveModeRequiresTavilyCredentials() {
         assertThatThrownBy(() -> new AppProperties("live", "gemini-key", "model", "", List.of(), 5, 20, 100, 3600, 60))

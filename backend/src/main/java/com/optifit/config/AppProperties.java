@@ -1,9 +1,12 @@
-package com.optifit;
+package com.optifit.config;
 
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import lombok.Builder;
+
+@Builder(toBuilder = true)
 @ConfigurationProperties("optifit")
 public record AppProperties(String mode, String geminiKey, String model, String searchKey,
         List<String> allowedMerchants, int sessionLimit, int ipLimit, int dailyLimit, int ttlSeconds,

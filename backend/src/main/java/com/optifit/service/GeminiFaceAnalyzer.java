@@ -1,21 +1,26 @@
-package com.optifit;
+package com.optifit.service;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.MimeTypeUtils;
 
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.Preferences;
-import com.optifit.Models.Shape;
+import com.optifit.exception.ApiException;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.Preferences;
+import com.optifit.model.Shape;
 
 import io.micrometer.core.instrument.MeterRegistry;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Performs the provider call and validates its result before it reaches product
  * search.
  */
-final class GeminiFaceAnalyzer implements FaceAnalyzer {
+@RequiredArgsConstructor
+public final class GeminiFaceAnalyzer implements FaceAnalyzer {
+
     private static final int MAX_GUIDANCE_LENGTH = 400;
     private static final int MAX_SHAPES = 3;
     private static final String SYSTEM_PROMPT = """
@@ -40,12 +45,6 @@ final class GeminiFaceAnalyzer implements FaceAnalyzer {
     private final ChatClient client;
     private final MeterRegistry metrics;
     private final String model;
-
-    GeminiFaceAnalyzer(ChatClient client, MeterRegistry metrics, String model) {
-        this.client = client;
-        this.metrics = metrics;
-        this.model = model;
-    }
 
     @Override
     public FaceProfile analyze(byte[] jpeg) {
@@ -86,7 +85,7 @@ final class GeminiFaceAnalyzer implements FaceAnalyzer {
         }
     }
 
-    static FaceProfile validate(FaceProfile profile) {
+    public static FaceProfile validate(FaceProfile profile) {
         if (profile == null || profile.guidance() == null || profile.guidance().length() > MAX_GUIDANCE_LENGTH
                 || profile.preferredShapes() == null || profile.preferredShapes().size() > MAX_SHAPES
                 || profile.preferredShapes().stream().anyMatch(shape -> shape == null || shape == Shape.UNKNOWN)) {

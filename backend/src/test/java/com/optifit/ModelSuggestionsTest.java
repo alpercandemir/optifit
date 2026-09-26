@@ -8,13 +8,18 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.optifit.Models.Category;
-import com.optifit.Models.FaceProfile;
-import com.optifit.Models.ModelSuggestion;
-import com.optifit.Models.Preferences;
-import com.optifit.Models.Shape;
+import com.optifit.model.Category;
+import com.optifit.model.FaceProfile;
+import com.optifit.model.ModelSuggestion;
+import com.optifit.model.Preferences;
+import com.optifit.model.Recommendation;
+import com.optifit.model.Shape;
+import com.optifit.search.WebProductSearch;
+import com.optifit.service.ModelSuggestions;
+import com.optifit.service.RecommendationRanker;
 
 class ModelSuggestionsTest {
+
     private ModelSuggestion candidate(String brand, String model) {
         return new ModelSuggestion(brand, model, Category.SUNGLASSES);
     }
@@ -54,8 +59,8 @@ class ModelSuggestionsTest {
                 fixture.p("2", "RB2140", BigDecimal.TEN, "IN_STOCK", Category.SUNGLASSES),
                 fixture.p("3", "RB3025", BigDecimal.TEN, "OUT_OF_STOCK", Category.SUNGLASSES),
                 fixture.p("4", "RB3016", new BigDecimal("4000"), "IN_STOCK", Category.SUNGLASSES));
-        assertThat(new RecommendationRanker().rank(products, prefs, face, false))
-                .extracting(Models.Recommendation::modelCode).containsExactly("RB2140", "RB4171");
+        assertThat(new RecommendationRanker().rank(products, prefs, face, false)).extracting(Recommendation::modelCode)
+                .containsExactly("RB2140", "RB4171");
         assertThat(new RecommendationRanker().rank(List.of(), prefs, face, false)).isEmpty();
         assertThat(ModelSuggestions.matches(candidate("Ray-Ban", "RB214"), products.get(1))).isFalse();
         assertThat(ModelSuggestions.matches(candidate("Osse", "RB2140"), products.get(1))).isFalse();

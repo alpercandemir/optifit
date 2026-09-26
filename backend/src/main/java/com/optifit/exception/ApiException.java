@@ -1,6 +1,7 @@
-package com.optifit;
+package com.optifit.exception;
 
 public final class ApiException extends RuntimeException {
+
     private static final long serialVersionUID = 1L;
     private final int status;
     private final String code;

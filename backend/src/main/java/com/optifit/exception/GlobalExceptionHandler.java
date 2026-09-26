@@ -1,4 +1,4 @@
-package com.optifit;
+package com.optifit.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,27 +10,28 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 @RestControllerAdvice
-class ApiErrors {
+public class GlobalExceptionHandler {
+
     @ExceptionHandler(ApiException.class)
-    ResponseEntity<ApiErrorResponse> handleApiException(ApiException exception) {
+    public ResponseEntity<ApiErrorResponse> handleApiException(ApiException exception) {
         return ResponseEntity.status(exception.status())
                 .body(new ApiErrorResponse(exception.code(), exception.getMessage()));
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    ResponseEntity<ApiErrorResponse> handleUploadSizeExceeded() {
+    public ResponseEntity<ApiErrorResponse> handleUploadSizeExceeded() {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(new ApiErrorResponse("FILE_TOO_LARGE", "The photo must not exceed 10 MB."));
     }
 
     @ExceptionHandler({MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class,
             MissingServletRequestPartException.class})
-    ResponseEntity<ApiErrorResponse> handleInvalidRequest() {
+    public ResponseEntity<ApiErrorResponse> handleInvalidRequest() {
         return handleApiException(ApiException.badRequest("Check the photo and your preferences."));
     }
 
     @ExceptionHandler(Exception.class)
-    ResponseEntity<ApiErrorResponse> handleUnexpectedException() {
+    public ResponseEntity<ApiErrorResponse> handleUnexpectedException() {
         return ResponseEntity.internalServerError()
                 .body(new ApiErrorResponse("SERVER_ERROR", "The request could not be completed. Please try again."));
     }
