@@ -1,0 +1,18 @@
+.idea/
+.DS_Store
+.env
+.env.*
+!.env.example
+backend/target/
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+.data/
+*.log
+
+# Generated build metadata and local credential files
+/target/
+*.tsbuildinfo
+*.pem
+*.key
