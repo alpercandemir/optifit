@@ -49,8 +49,7 @@ const messages: Record<string, string> = {
     'Görsel değerlendirme tamamlanamadı. Tekrar deneyin.',
   'Upload a clear, front-facing photo containing exactly one face.':
     'Fotoğrafta yeterli bilgi tespit edemedik.',
-  "We couldn't detect photo as enough information.":
-    'Fotoğrafta yeterli bilgi tespit edemedik.',
+  "We couldn't detect photo as enough information.": 'Fotoğrafta yeterli bilgi tespit edemedik.',
   'Facial contours are not clear enough. Try a sharper photo.':
     'Yüz hatları yeterince seçilemiyor. Daha net bir fotoğraf deneyin.',
   'The analysis limit has been reached. Please try again later.':
