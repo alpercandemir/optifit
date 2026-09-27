@@ -47,7 +47,8 @@ class GeminiIntegrationTest {
             body.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
             String profile = """
                     {"usable":true,"faceCount":1,"guidance":"Visual style suggestion only.","preferredShapes":["ROUND"],
-                     "suggestedModels":[{"brand":"Ray-Ban","modelCode":"RB 3447","category":"SUNGLASSES"}]}
+                     "suggestedModels":[{"brand":"Ray-Ban","modelCode":"RB 3447","category":"SUNGLASSES"}],
+                     "suggestedKeywords":[]}
                     """;
             byte[] response = json
                     .writeValueAsBytes(java.util.Map.of("modelVersion", "gemini-2.5-flash-lite", "candidates",
