@@ -86,7 +86,7 @@ class JobLifecycleTest {
         var searched = new AtomicBoolean();
         var p = settings(60);
         var service = new RecommendationService(jobs, bytes -> {
-            throw new ApiException(422, "PHOTO_NOT_USABLE", "Upload a photo containing exactly one face.");
+            throw new ApiException(422, "PHOTO_NOT_USABLE", "We couldn't detect photo as enough information.");
         }, (prefs, face) -> {
             searched.set(true);
             return List.of();

@@ -32,6 +32,6 @@ class GeminiFaceAnalyzerTest {
     void doesNotExposeArbitraryProviderGuidanceInApiErrors() {
         var profile = new FaceProfile(false, 2, "Untrusted provider-generated text", List.of());
         assertThatThrownBy(() -> GeminiFaceAnalyzer.validate(profile)).isInstanceOf(ApiException.class)
-                .hasMessage("Upload a clear, front-facing photo containing exactly one face.");
+                .hasMessage("We couldn't detect photo as enough information.");
     }
 }

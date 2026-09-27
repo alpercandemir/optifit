@@ -181,7 +181,14 @@ public class ProductPageParser {
             model = modelCode(name);
         }
         var heading = document.selectFirst("h1");
-        if (model.isEmpty() || heading == null || !model.equals(modelCode(heading.text()))) {
+        if (model.isEmpty() || heading == null) {
+            return Optional.empty();
+        }
+        String headingModel = modelCode(heading.text());
+        if (!headingModel.isEmpty() && !model.equals(headingModel)) {
+            return Optional.empty();
+        }
+        if (headingModel.isEmpty() && !normalize(heading.text()).contains(normalize(brand))) {
             return Optional.empty();
         }
         String categoryText = normalize(name + " " + node.path("category").asString(""));
@@ -294,11 +301,11 @@ public class ProductPageParser {
     // Localized keywords are external merchant vocabulary, not application
     // messages.
     private static Category category(String text) {
+        if (containsAny(text, "optik", "numarali", "eyeglass", "cerceve", "mavi koruma", "mavi isik")) {
+            return Category.OPTICAL;
+        }
         if (containsAny(text, "gunes", "sunglass")) {
             return Category.SUNGLASSES;
-        }
-        if (containsAny(text, "optik", "numarali", "eyeglass")) {
-            return Category.OPTICAL;
         }
         return null;
     }

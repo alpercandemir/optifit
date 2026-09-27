@@ -165,14 +165,58 @@ public class WebProductSearch implements ProductSearchProvider {
             String candidates = models.stream().map(model -> "\"" + model.brand() + " " + model.modelCode() + "\"")
                     .collect(Collectors.joining(" OR "));
             return "(" + candidates + ") "
-                    + (preferences.category() == Category.SUNGLASSES ? "güneş gözlüğü" : "optik gözlük çerçevesi");
+                    + (preferences.category() == Category.SUNGLASSES
+                            ? "güneş gözlüğü"
+                            : "mavi ışık filtreli gözlük optik çerçeve");
         }
         return shapeQuery(preferences, face);
     }
 
+    private static String turkishShape(Shape shape) {
+        return switch (shape) {
+            case ROUND -> "yuvarlak";
+            case RECTANGULAR -> "köşeli";
+            case CAT_EYE -> "kedi gözü";
+            case AVIATOR -> "damla";
+            case GEOMETRIC -> "geometrik";
+            case BROWLINE -> "yarım çerçeve";
+            case UNKNOWN -> "";
+        };
+    }
+
     private static String shapeQuery(Preferences preferences, FaceProfile face) {
-        return (preferences.category() == Category.OPTICAL ? "optical eyeglass frames" : "sunglasses") + " "
-                + RecommendationRanker.label(face.preferredShapes().getFirst()).toLowerCase(Locale.ROOT);
+        String query = (preferences.category() == Category.OPTICAL
+                ? "mavi ışık filtreli gözlük optik çerçeve"
+                : "güneş gözlüğü") + " " + turkishShape(face.preferredShapes().getFirst());
+        if (preferences.color() != null && !"ANY".equals(preferences.color())) {
+            query += " " + turkishColor(preferences.color());
+        }
+        if (preferences.style() != null && !"ANY".equals(preferences.style())) {
+            query += " " + turkishStyle(preferences.style());
+        }
+        if (face.suggestedKeywords() != null && !face.suggestedKeywords().isEmpty()) {
+            query += " " + String.join(" ", face.suggestedKeywords());
+        }
+        return query;
+    }
+
+    private static String turkishColor(String color) {
+        return switch (color) {
+            case "BLACK" -> "siyah";
+            case "BROWN" -> "kahverengi";
+            case "GOLD" -> "altın";
+            case "CLEAR" -> "şeffaf";
+            default -> "";
+        };
+    }
+
+    private static String turkishStyle(String style) {
+        return switch (style) {
+            case "CLASSIC" -> "klasik";
+            case "MODERN" -> "modern";
+            case "BOLD" -> "kalın";
+            default -> "";
+        };
     }
 
     private record PageRequest(String url, boolean discoverProducts) {
@@ -288,10 +332,16 @@ public class WebProductSearch implements ProductSearchProvider {
     public static List<Product> demoProducts(Category category) {
         // Real discovered source links, no invented stock/price or claims of live
         // verification.
-        // Optical demo intentionally returns no match rather than relabeling sunglasses
-        // as prescription frames.
         if (category == Category.OPTICAL) {
-            return List.of();
+            return List.of(demo("demo-optik-1", "BB4003", "Manebi Mavi Koruma", Shape.ROUND, "CLEAR",
+                    "manebi-manebi-mavi-koruma-bb4003-c102-5018140_83644",
+                    "https://stn-atasun.mncdn.com/Content/media/ProductImg/original/gu036708-rb-0rbr0103s-001vr-5321140-638741241686624228.png"),
+                    demo("demo-optik-2", "BB069", "Manebi Mavi Koruma Klasik", Shape.RECTANGULAR, "BLACK",
+                            "manebi-manebi-mavi-koruma-bb069-c101-4817136_83639",
+                            "https://stn-atasun.mncdn.com/Content/media/ProductImg/original/gu021638-rb-x1-2140-902-5022150-639107252383816776.jpg"),
+                    demo("demo-optik-3", "BBTH-12", "Atasun Aksesuar Mavi Koruma", Shape.ROUND, "BROWN",
+                            "atasun-aksesuar-manebi-mavi-koruma-bbth-12-c60-4220145_84131",
+                            "https://stn-atasun.mncdn.com/Content/media/ProductImg/original/gu020929-rb-4171-6228g-5418145-638288289028848005.png"));
         }
         return List.of(demo("demo-wayfarer", "RB2140", "Wayfarer Tortoise", Shape.RECTANGULAR, "BROWN",
                 "ray-ban-rb-x1-2140-902-5022150-erkek-gunes-gozlukleri_81552",

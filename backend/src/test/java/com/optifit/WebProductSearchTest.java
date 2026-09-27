@@ -142,7 +142,7 @@ class WebProductSearchTest {
         assertThat(payload.path("include_domains").get(0).asString()).isEqualTo("shop.example");
         assertThat(payload.path("include_domains_mode").asString()).isEqualTo("restrict");
         assertThat(payload.path("max_results").asInt()).isEqualTo(12);
-        assertThat(payload.path("query").asString()).isEqualTo("sunglasses round");
+        assertThat(payload.path("query").asString()).isEqualTo("güneş gözlüğü yuvarlak");
         assertThat(payload.path("country").asString()).isEqualTo("turkey");
         assertThat(body).doesNotContain("private-gemini-key", "private-tavily-key", "Private face description");
     }
@@ -174,7 +174,7 @@ class WebProductSearchTest {
         var first = json.readTree(requestBody(capture.getAllValues().get(0)));
         var fallback = json.readTree(requestBody(capture.getAllValues().get(1)));
         assertThat(first.path("query").asString()).contains("RB9999");
-        assertThat(fallback.path("query").asString()).isEqualTo("sunglasses round");
+        assertThat(fallback.path("query").asString()).isEqualTo("güneş gözlüğü yuvarlak");
         assertThat(fallback.path("search_depth").asString()).isEqualTo("basic");
         assertThat(fallback.path("include_domains").get(0).asString()).isEqualTo("shop.example");
         assertThat(fallback.path("auto_parameters").asBoolean()).isFalse();

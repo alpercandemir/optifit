@@ -46,7 +46,7 @@ class ModelSuggestionsTest {
         assertThat(WebProductSearch.searchQuery(prefs, face))
                 .isEqualTo("(\"Ray-Ban RB2140\" OR \"Osse OS1234\") güneş gözlüğü");
         assertThat(WebProductSearch.searchQuery(prefs, new FaceProfile(true, 1, "", List.of(Shape.RECTANGULAR))))
-                .isEqualTo("sunglasses rectangular");
+                .isEqualTo("güneş gözlüğü köşeli");
     }
 
     @Test

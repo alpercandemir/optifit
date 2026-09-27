@@ -48,7 +48,9 @@ const messages: Record<string, string> = {
   'The visual assessment could not be completed. Please try again.':
     'Görsel değerlendirme tamamlanamadı. Tekrar deneyin.',
   'Upload a clear, front-facing photo containing exactly one face.':
-    'Önden çekilmiş, tek yüz içeren net bir fotoğraf yükleyin.',
+    'Fotoğrafta yeterli bilgi tespit edemedik.',
+  "We couldn't detect photo as enough information.":
+    'Fotoğrafta yeterli bilgi tespit edemedik.',
   'Facial contours are not clear enough. Try a sharper photo.':
     'Yüz hatları yeterince seçilemiyor. Daha net bir fotoğraf deneyin.',
   'The analysis limit has been reached. Please try again later.':
@@ -69,7 +71,7 @@ const messages: Record<string, string> = {
 }
 
 const errors: Record<string, string> = {
-  PHOTO_NOT_USABLE: 'Önden çekilmiş, tek yüz içeren net bir fotoğraf yükleyin.',
+  PHOTO_NOT_USABLE: 'Fotoğrafta yeterli bilgi tespit edemedik.',
   AI_RESPONSE_INVALID: 'Görsel değerlendirme tamamlanamadı. Tekrar deneyin.',
   SESSION_EXPIRED: 'Oturum yenilenmeli. Sayfayı yenileyip tekrar deneyin.',
   NOT_FOUND: 'Sonuç artık erişilebilir değil. Yeni analiz başlatabilirsiniz.',
